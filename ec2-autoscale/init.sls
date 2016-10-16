@@ -81,11 +81,12 @@ def run():
 
     message = json.loads(sns['Message'])
     instance_id = str(message['EC2InstanceId'])
+    instance_name = ':'.join([str(message['AutoScalingGroupName']), str(message['EC2InstanceId'])])
 
     if 'launch' in sns['Subject']:
         vm_ = __opts__.get('ec2.autoscale', {})
         vm_['reactor'] = True
-        vm_['instances'] = instance_id
+        vm_['instances'] = instance_name
         vm_['instance_id'] = instance_id
         vm_list = []
         for key, value in vm_.iteritems():
@@ -101,7 +102,7 @@ def run():
         ret = {
             'ec2_autoscale_termination': {
                 'wheel.key.delete': [
-                    {'match': instance_id},
+                    {'match': instance_name}
                 ]
             }
         }
